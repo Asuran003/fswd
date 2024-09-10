@@ -4,43 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vasanth | Portfolio</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: #f4f4f4;
+            color: #333;
+            text-align: center;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding: 20px;
+        }
+        header a {
+            color: #fff;
+            margin: 0 15px;
+            text-decoration: none;
+        }
+        section {
+            padding: 40px;
+        }
+        section#skills, section#contact {
+            background: #fff;
+        }
+        footer {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+        }
+        .profile-img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            margin: 20px 0;
+        }
+    </style>
 </head>
-<body style="font-family: Arial; margin: 0; background: #f4f4f4; color: #333; text-align: center;">
+<body>
 
-    <header style="background: #333; color: #fff; padding: 20px;">
+    <header>
         <h1>Vasanth Arul</h1>
         <nav>
-            <a href="#about" style="color: #fff; margin: 0 15px;">About</a>
-            <a href="#skills" style="color: #fff; margin: 0 15px;">Skills</a>
-            <a href="#portfolio" style="color: #fff; margin: 0 15px;">Portfolio</a>
-            <a href="#contact" style="color: #fff; margin: 0 15px;">Contact</a>
+            <a href="#about">About</a>
+            <a href="#skills">Skills</a>
+            <a href="#portfolio">Portfolio</a>
+            <a href="#contact">Contact</a>
         </nav>
     </header>
 
-    <section id="about" style="padding: 40px;">
+    <section id="about">
         <h2>About Me</h2>
-        <p>I am Vasanth, a student from Anna Unuversity,Trichirappallli.</p>
+        <img src="profile.jpg" alt="Profile Picture" class="profile-img">
+        <p>I am Vasanth, a student from Anna University, Trichirappalli.</p>
     </section>
 
-    <section id="skills" style="padding: 40px; background: #fff;">
+    <section id="skills">
         <h2>Skills</h2>
         <p><strong>Front-End Languages:</strong> HTML, CSS</p>
         <p><strong>Back-End Languages:</strong> Node.js, Python</p>
         <p><strong>Programming Languages:</strong> JavaScript, Python, Java</p>
     </section>
 
-    <section id="portfolio" style="padding: 40px;">
+    <section id="portfolio">
         <h2>Portfolio</h2>
-        <p>Project 1: micro blog app</p>
+        <p>Project 1: Micro Blog App</p>
         <p>Project 2: TO-DO List Application</p>
     </section>
 
-    <section id="contact" style="padding: 40px; background: #fff;">
+    <section id="contact">
         <h2>Contact Me</h2>
-        <p>Email: vasantharulsundaram.gmailcom</p>
+        <p>Email: vasantharulsundaram@gmail.com</p>
     </section>
 
-    <footer style="background: #333; color: #fff; padding: 10px;">
+    <footer>
         &copy; 2024 Vasanth
     </footer>
 
