@@ -7,7 +7,7 @@ header {
 }
 
 /* Styles specifically for the logo image */
-#profile {
+#image {
     display: inline-block; /* Ensures the image is centered as an inline element */
     max-width: 100;       /* Responsive width to prevent overflow */
     height: 100;          /* Maintains the aspect ratio */
