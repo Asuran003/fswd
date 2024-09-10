@@ -9,7 +9,7 @@ header {
 /* Styles specifically for the logo image */
 #profile {
     display: inline-block; /* Ensures the image is centered as an inline element */
-    max-width: 100%;       /* Responsive width to prevent overflow */
+    max-width: 10%;       /* Responsive width to prevent overflow */
     height: auto;          /* Maintains the aspect ratio */
 }
 /* Ensure the image doesn't exceed its container */
