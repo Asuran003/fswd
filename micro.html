@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microblogging App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    header {
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      padding: 1rem;
+    }
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    #login-form, #registration-form, #user-dashboard {
+      margin-bottom: 2rem;
+    }
+    h2 {
+      margin-bottom: 1rem;
+    }
+    input, textarea, button {
+      margin: 0.5rem; 
+      padding: 0.3rem;
+    }
+    button {
+      background-color: #333;
+      color: #fff;
+      border: none; 
+      cursor: pointer;
+    }
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    li {
+      border: 1px solid #ddd;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    li p {
+      margin: 0;
+    }
+    .post-img {
+      max-width: 100%;
+      height: auto;
+      margin-top: 0.5rem;
+    }
+    .comments {
+      margin-top: 1rem;
+      border-top: 1px solid #ddd;
+      padding-top: 1rem;
+    }
+    .comment-input {
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Microblogging App</h1>
+  </header>
+  <main>
+    <div id="registration-form">
+      <h2>Register</h2>
+      <input type="text" id="reg-username" placeholder="Username">
+      <input type="password" id="reg-password" placeholder="Password">
+      <button id="register-btn">Register</button>
+    </div>
+    <div id="login-form" style="display: none;">
+      <h2>Login</h2>
+      <input type="text" id="username" placeholder="Username">
+      <input type="password" id="password" placeholder="Password">
+      <button id="login-btn">Login</button>
+    </div>
+    <div id="user-dashboard" style="display: none;">
+      <h2>Welcome, <span id="user-username"></span>!</h2>
+      <textarea id="post-content" placeholder="Write your post..."></textarea>
+      <input type="file" id="post-image" accept="image/*">
+      <button id="post-btn">Post</button>
+    </div>
+    <div id="feed">
+      <h2>Feed</h2>
+      <ul id="post-list"></ul>
+    </div>
+  </main>
+  
+  <script>
+    const loginForm = document.getElementById('login-form'); 
+    const registrationForm = document.getElementById('registration-form');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password'); 
+    const registerButton = document.getElementById('register-btn');
+    const loginButton = document.getElementById('login-btn');
+    const userDashboard = document.getElementById('user-dashboard');
+    const userUsername = document.getElementById('user-username'); 
+    const postContent = document.getElementById('post-content'); 
+    const postImage = document.getElementById('post-image');
+    const postButton = document.getElementById('post-btn');
+    const postList = document.getElementById('post-list');
+    let currentUser = null;
+    
+    registerButton.addEventListener('click', () => {
+      const regUsername = document.getElementById('reg-username').value.trim();
+      const regPassword = document.getElementById('reg-password').value.trim();
+
+      if (regUsername !== '' && regPassword !== '') {
+        if (registerUser(regUsername, regPassword)) {
+          alert('Registration successful! Please log in.');
+          registrationForm.style.display = 'none';
+          loginForm.style.display = 'block';
+        } else {
+          alert('Username already exists. Please choose another one.');
+        }
+      } else {
+        alert('Please enter both username and password.');
+      }
+    });
+
+    function registerUser(username, password) {
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      if (!users.some(user => user.username === username)) {
+        users.push({ username: username, password: password });
+        localStorage.setItem('users', JSON.stringify(users));
+        return true;
+      }
+      return false;
+    }
+
+    loginButton.addEventListener('click', () => {
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (username !== '' && password !== '') {
+        if (checkCredentials(username, password)) {
+          currentUser = username; 
+          loginForm.style.display = 'none'; 
+          userDashboard.style.display = 'block'; 
+          userUsername.textContent = username;
+          loadPosts();
+        } else {
+          alert('Invalid username or password.');
+        }
+      } else {
+        alert('Please enter both username and password.');
+      }
+    });
+
+    function checkCredentials(username, password) {
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      return users.some(user => user.username === username && user.password === password);
+    }
+
+    postButton.addEventListener('click', () => {
+      const content = postContent.value.trim();
+      const imageFile = postImage.files[0];
+
+      if (content !== '' || imageFile) {
+        const post = {
+          username: currentUser,
+          content: content,
+          timestamp: new Date().toLocaleString(),
+          image: imageFile ? URL.createObjectURL(imageFile) : null,
+          likes: 0,
+          dislikes: 0,
+          comments: [] // Initialize comments array
+        };
+        savePost(post); 
+        postContent.value = '';
+        postImage.value = '';
+        loadPosts();
+      } else {
+        alert('Please enter a post or upload an image.'); 
+      }
+    });
+
+    function savePost(post) {
+      let posts = JSON.parse(localStorage.getItem('posts')) || [];
+      posts.push(post);
+      localStorage.setItem('posts', JSON.stringify(posts));
+    }
+
+    function loadPosts() {
+      postList.innerHTML = '';
+      const posts = JSON.parse(localStorage.getItem('posts')) || [];
+      posts.forEach((post, index) => {
+        const postItem = document.createElement('li');
+        postItem.innerHTML = `
+          <p><strong>${post.username}</strong> (${post.timestamp}): ${post.content}</p>
+          ${post.image ? `<img class="post-img" src="${post.image}" alt="Post Image">` : ''}
+          <button onclick="likePost(${index})">Like (${post.likes})</button>
+          <button onclick="dislikePost(${index})">Dislike (${post.dislikes})</button>
+          <button onclick="deletePost(${index})">Delete</button> <!-- Delete button -->
+          <div class="comments">
+            <h3>Comments:</h3>
+            <ul id="comments-list-${index}"></ul>
+            <input type="text" id="comment-input-${index}" class="comment-input" placeholder="Add a comment...">
+            <button onclick="addComment(${index})">Comment</button>
+          </div>
+        `;
+        postList.appendChild(postItem);
+        loadComments(index, post.comments); // Load comments for the post
+      });
+    }
+
+    function loadComments(postIndex, comments) {
+      const commentsList = document.getElementById(`comments-list-${postIndex}`);
+      commentsList.innerHTML = '';
+      comments.forEach(comment => {
+        const commentItem = document.createElement('li');
+        commentItem.textContent = comment;
+        commentsList.appendChild(commentItem);
+      });
+    }
+
+    function addComment(postIndex) {
+      const commentInput = document.getElementById(`comment-input-${postIndex}`);
+      const comment = commentInput.value.trim();
+      if (comment !== '') {
+        let posts = JSON.parse(localStorage.getItem('posts')) || [];
+        posts[postIndex].comments.push(comment);
+        localStorage.setItem('posts', JSON.stringify(posts));
+        commentInput.value = ''; // Clear input
+        loadPosts(); // Refresh post list to show new comment
+      } else {
+        alert('Please enter a comment.'); // Error handling
+      }
+    }
+
+    function likePost(index) {
+      let posts = JSON.parse(localStorage.getItem('posts')) || [];
+      posts[index].likes++;
+      localStorage.setItem('posts', JSON.stringify(posts));
+      loadPosts();
+    }
+
+    function dislikePost(index) {
+      let posts = JSON.parse(localStorage.getItem('posts')) || [];
+      posts[index].dislikes++;
+      localStorage.setItem('posts', JSON.stringify(posts));
+      loadPosts();
+    }
+
+    function deletePost(index) {
+      let posts = JSON.parse(localStorage.getItem('posts')) || [];
+      posts.splice(index, 1); // Remove the post from the array
+      localStorage.setItem('posts', JSON.stringify(posts));
+      loadPosts(); // Refresh post list
+    }
+
+    // Initial setup
+    if (localStorage.getItem('users') === null) {
+      localStorage.setItem('users', JSON.stringify([]));
+    }
+    
+    if (localStorage.getItem('posts') === null) {
+      localStorage.setItem('posts', JSON.stringify([]));
+    }
+
+    // Show login form after successful registration
+    registrationForm.style.display = 'block';
+  </script>
+</body>
+</html>
