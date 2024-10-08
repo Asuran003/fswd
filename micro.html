@@ -67,17 +67,18 @@
     <h1>Microblogging App</h1>
   </header>
   <main>
-    <div id="registration-form">
-      <h2>Register</h2>
-      <input type="text" id="reg-username" placeholder="Username">
-      <input type="password" id="reg-password" placeholder="Password">
-      <button id="register-btn">Register</button>
-    </div>
-    <div id="login-form" style="display: none;">
+    <div id="login-form">
       <h2>Login</h2>
       <input type="text" id="username" placeholder="Username">
       <input type="password" id="password" placeholder="Password">
       <button id="login-btn">Login</button>
+      <p>Don't have an account? <a href="#" id="show-register">Create an account</a></p>
+    </div>
+    <div id="registration-form" style="display: none;">
+      <h2>Register</h2>
+      <input type="text" id="reg-username" placeholder="Username">
+      <input type="password" id="reg-password" placeholder="Password">
+      <button id="register-btn">Register</button>
     </div>
     <div id="user-dashboard" style="display: none;">
       <h2>Welcome, <span id="user-username"></span>!</h2>
@@ -106,13 +107,20 @@
     const postList = document.getElementById('post-list');
     let currentUser = null;
     
-    registerButton.addEventListener('click', () => {
+    // Event listeners
+    registerButton.addEventListener('click', handleRegistration);
+    loginButton.addEventListener('click', handleLogin);
+    document.getElementById('show-register').addEventListener('click', showRegistrationForm);
+    postButton.addEventListener('click', createPost);
+
+    // Registration Handler
+    function handleRegistration() {
       const regUsername = document.getElementById('reg-username').value.trim();
       const regPassword = document.getElementById('reg-password').value.trim();
 
       if (regUsername !== '' && regPassword !== '') {
         if (registerUser(regUsername, regPassword)) {
-          alert('Registration successful! Please log in.');
+          alert('Registration successful! You can log in now.');
           registrationForm.style.display = 'none';
           loginForm.style.display = 'block';
         } else {
@@ -121,8 +129,9 @@
       } else {
         alert('Please enter both username and password.');
       }
-    });
+    }
 
+    // User Registration Logic
     function registerUser(username, password) {
       const users = JSON.parse(localStorage.getItem('users')) || [];
       if (!users.some(user => user.username === username)) {
@@ -133,7 +142,8 @@
       return false;
     }
 
-    loginButton.addEventListener('click', () => {
+    // Login Handler
+    function handleLogin() {
       const username = usernameInput.value.trim();
       const password = passwordInput.value.trim();
 
@@ -150,14 +160,23 @@
       } else {
         alert('Please enter both username and password.');
       }
-    });
+    }
 
+    // Credential Check
     function checkCredentials(username, password) {
       const users = JSON.parse(localStorage.getItem('users')) || [];
       return users.some(user => user.username === username && user.password === password);
     }
 
-    postButton.addEventListener('click', () => {
+    // Show Registration Form
+    function showRegistrationForm(e) {
+      e.preventDefault();
+      registrationForm.style.display = 'block';
+      loginForm.style.display = 'none';
+    }
+
+    // Create Post Handler
+    function createPost() {
       const content = postContent.value.trim();
       const imageFile = postImage.files[0];
 
@@ -169,7 +188,7 @@
           image: imageFile ? URL.createObjectURL(imageFile) : null,
           likes: 0,
           dislikes: 0,
-          comments: [] // Initialize comments array
+          comments: [] 
         };
         savePost(post); 
         postContent.value = '';
@@ -178,14 +197,16 @@
       } else {
         alert('Please enter a post or upload an image.'); 
       }
-    });
+    }
 
+    // Save Post Logic
     function savePost(post) {
       let posts = JSON.parse(localStorage.getItem('posts')) || [];
       posts.push(post);
       localStorage.setItem('posts', JSON.stringify(posts));
     }
 
+    // Load Posts
     function loadPosts() {
       postList.innerHTML = '';
       const posts = JSON.parse(localStorage.getItem('posts')) || [];
@@ -196,7 +217,7 @@
           ${post.image ? `<img class="post-img" src="${post.image}" alt="Post Image">` : ''}
           <button onclick="likePost(${index})">Like (${post.likes})</button>
           <button onclick="dislikePost(${index})">Dislike (${post.dislikes})</button>
-          <button onclick="deletePost(${index})">Delete</button> <!-- Delete button -->
+          <button onclick="deletePost(${index})">Delete</button>
           <div class="comments">
             <h3>Comments:</h3>
             <ul id="comments-list-${index}"></ul>
@@ -205,10 +226,11 @@
           </div>
         `;
         postList.appendChild(postItem);
-        loadComments(index, post.comments); // Load comments for the post
+        loadComments(index, post.comments);
       });
     }
 
+    // Load Comments for a Post
     function loadComments(postIndex, comments) {
       const commentsList = document.getElementById(`comments-list-${postIndex}`);
       commentsList.innerHTML = '';
@@ -219,6 +241,7 @@
       });
     }
 
+    // Add Comment
     function addComment(postIndex) {
       const commentInput = document.getElementById(`comment-input-${postIndex}`);
       const comment = commentInput.value.trim();
@@ -226,13 +249,14 @@
         let posts = JSON.parse(localStorage.getItem('posts')) || [];
         posts[postIndex].comments.push(comment);
         localStorage.setItem('posts', JSON.stringify(posts));
-        commentInput.value = ''; // Clear input
-        loadPosts(); // Refresh post list to show new comment
+        commentInput.value = '';
+        loadPosts();
       } else {
-        alert('Please enter a comment.'); // Error handling
+        alert('Please enter a comment.');
       }
     }
 
+    // Like Post
     function likePost(index) {
       let posts = JSON.parse(localStorage.getItem('posts')) || [];
       posts[index].likes++;
@@ -240,6 +264,7 @@
       loadPosts();
     }
 
+    // Dislike Post
     function dislikePost(index) {
       let posts = JSON.parse(localStorage.getItem('posts')) || [];
       posts[index].dislikes++;
@@ -247,14 +272,15 @@
       loadPosts();
     }
 
+    // Delete Post
     function deletePost(index) {
       let posts = JSON.parse(localStorage.getItem('posts')) || [];
-      posts.splice(index, 1); // Remove the post from the array
+      posts.splice(index, 1);
       localStorage.setItem('posts', JSON.stringify(posts));
-      loadPosts(); // Refresh post list
+      loadPosts();
     }
 
-    // Initial setup
+    // Initial Setup
     if (localStorage.getItem('users') === null) {
       localStorage.setItem('users', JSON.stringify([]));
     }
@@ -263,8 +289,6 @@
       localStorage.setItem('posts', JSON.stringify([]));
     }
 
-    // Show login form after successful registration
-    registrationForm.style.display = 'block';
   </script>
 </body>
 </html>
