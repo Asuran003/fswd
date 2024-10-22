@@ -170,147 +170,135 @@
     </section>
 
     <script>
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-    let currentUser = localStorage.getItem("currentUser");
-    let userProducts = JSON.parse(localStorage.getItem("userProducts")) || {};
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+        let currentUser = localStorage.getItem("currentUser");
 
-    // Show sections dynamically
-    function showSection(sectionId) {
-        document.querySelectorAll("section").forEach(section => section.classList.add("hidden"));
-        document.getElementById(sectionId).classList.remove("hidden");
-    }
-
-    // Toggle visibility of login/logout links and buy/sell options
-    function toggleLoginLinks() {
-        if (currentUser) {
-            document.getElementById("login-link").classList.add("hidden");
-            document.getElementById("logout-link").classList.remove("hidden");
-            document.getElementById("home-link").classList.remove("hidden");
-            document.getElementById("sell-link").classList.remove("hidden");
-            showSection('product-list');
-            loadProducts(); // Load products after logging in
-        } else {
-            document.getElementById("login-link").classList.remove("hidden");
-            document.getElementById("logout-link").classList.add("hidden");
-            document.getElementById("home-link").classList.add("hidden");
-            document.getElementById("sell-link").classList.add("hidden");
-            document.getElementById("product-list").classList.add("hidden");
-            document.getElementById("sell-form").classList.add("hidden");
-            showSection('login-form');
+        // Show sections dynamically
+        function showSection(sectionId) {
+            document.querySelectorAll("section").forEach(section => section.classList.add("hidden"));
+            document.getElementById(sectionId).classList.remove("hidden");
         }
-    }
 
-    // Register new user
-    document.getElementById("registerUserForm").addEventListener('submit', function(event) {
-        event.preventDefault();
-        const username = document.getElementById("reg-username").value;
-        const password = document.getElementById("reg-password").value;
-
-        if (users.some(user => user.username === username)) {
-            alert("Username already exists");
-        } else {
-            users.push({ username, password });
-            localStorage.setItem("users", JSON.stringify(users));
-            alert("Registration successful. Please log in.");
-            showSection('login-form');
+        // Toggle visibility of login/logout links and buy/sell options
+        function toggleLoginLinks() {
+            if (currentUser) {
+                document.getElementById("login-link").classList.add("hidden");
+                document.getElementById("logout-link").classList.remove("hidden");
+                document.getElementById("home-link").classList.remove("hidden");
+                document.getElementById("sell-link").classList.remove("hidden");
+                showSection('product-list');
+                loadProducts(); // Load products after logging in
+            } else {
+                document.getElementById("login-link").classList.remove("hidden");
+                document.getElementById("logout-link").classList.add("hidden");
+                document.getElementById("home-link").classList.add("hidden");
+                document.getElementById("sell-link").classList.add("hidden");
+                document.getElementById("product-list").classList.add("hidden");
+                document.getElementById("sell-form").classList.add("hidden");
+                showSection('login-form');
+            }
         }
-    });
 
-    // Login user
-    document.getElementById("loginUserForm").addEventListener('submit', function(event) {
-        event.preventDefault();
-        const username = document.getElementById("login-username").value;
-        const password = document.getElementById("login-password").value;
+        // Register new user
+        document.getElementById("registerUserForm").addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById("reg-username").value;
+            const password = document.getElementById("reg-password").value;
 
-        const user = users.find(user => user.username === username && user.password === password);
+            if (users.some(user => user.username === username)) {
+                alert("Username already exists");
+            } else {
+                users.push({ username, password });
+                localStorage.setItem("users", JSON.stringify(users));
+                alert("Registration successful. Please log in.");
+                showSection('login-form');
+            }
+        });
 
-        if (user) {
-            localStorage.setItem("currentUser", username);
-            currentUser = username;
+        // Login user
+        document.getElementById("loginUserForm").addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById("login-username").value;
+            const password = document.getElementById("login-password").value;
+
+            const user = users.find(user => user.username === username && user.password === password);
+
+            if (user) {
+                localStorage.setItem("currentUser", username);
+                currentUser = username;
+                toggleLoginLinks();
+            } else {
+                alert("Invalid username or password");
+            }
+        });
+
+        // Logout user
+        function logout() {
+            localStorage.removeItem("currentUser");
+            currentUser = null;
             toggleLoginLinks();
-        } else {
-            alert("Invalid username or password");
-        }
-    });
-
-    // Logout user
-    function logout() {
-        localStorage.removeItem("currentUser");
-        currentUser = null;
-        toggleLoginLinks();
-    }
-
-    // Product data and adding logic
-    let products = JSON.parse(localStorage.getItem("products")) || [];
-    const productsContainer = document.getElementById("products-container");
-    const addProductForm = document.getElementById("addProductForm");
-
-    addProductForm.addEventListener('submit', function (event) {
-        event.preventDefault();
-
-        if (!currentUser) {
-            alert("You must be logged in to sell a product.");
-            return;
         }
 
-        const title = document.getElementById("title").value;
-        const description = document.getElementById("description").value;
-        const price = document.getElementById("price").value;
-        const image = document.getElementById("image").files[0];
+        // Product data and adding logic
+        let products = JSON.parse(localStorage.getItem("products")) || [];
 
-        const reader = new FileReader();
-        reader.onloadend = function() {
+        const productsContainer = document.getElementById("products-container");
+        const addProductForm = document.getElementById("addProductForm");
+
+        addProductForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            if (!currentUser) {
+                alert("You must be logged in to sell a product.");
+                return;
+            }
+
+            const title = document.getElementById("title").value;
+            const description = document.getElementById("description").value;
+            const price = document.getElementById("price").value;
+            const image = document.getElementById("image").files[0];
+
             const newProduct = {
                 title,
                 description,
                 price,
-                image: reader.result // Save the base64 string of the image
+                image: URL.createObjectURL(image)
             };
 
             products.push(newProduct);
-            userProducts[currentUser] = userProducts[currentUser] || [];
-            userProducts[currentUser].push(newProduct);
-
             localStorage.setItem("products", JSON.stringify(products)); // Save updated product list
-            localStorage.setItem("userProducts", JSON.stringify(userProducts)); // Save user products
             displayProducts();
             addProductForm.reset();
-        };
-        
-        if (image) {
-            reader.readAsDataURL(image); // Convert the image file to base64
-        }
-    });
-
-    // Display products
-    function displayProducts() {
-        productsContainer.innerHTML = "";
-        products.forEach(product => {
-            const productCard = document.createElement("div");
-            productCard.classList.add("product-card");
-
-            productCard.innerHTML = `
-                <img src="${product.image}" alt="${product.title}">
-                <h3>${product.title}</h3>
-                <p>${product.description}</p>
-                <p><strong>Price:</strong> $${product.price}</p>
-            `;
-
-            productsContainer.appendChild(productCard);
         });
-    }
 
-    // Load products on page load
-    function loadProducts() {
-        products = JSON.parse(localStorage.getItem("products")) || [];
-        displayProducts();
-    }
+        // Display products
+        function displayProducts() {
+            productsContainer.innerHTML = "";
+            products.forEach(product => {
+                const productCard = document.createElement("div");
+                productCard.classList.add("product-card");
 
-    window.onload = function() {
-        toggleLoginLinks();
-        loadProducts(); // Load products when the page loads
-    };
-</script>
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.title}">
+                    <h3>${product.title}</h3>
+                    <p>${product.description}</p>
+                    <p><strong>Price:</strong> $${product.price}</p>
+                `;
 
+                productsContainer.appendChild(productCard);
+            });
+        }
+
+        // Load products on page load
+        function loadProducts() {
+            products = JSON.parse(localStorage.getItem("products")) || [];
+            displayProducts();
+        }
+
+        window.onload = function() {
+            toggleLoginLinks();
+            loadProducts(); // Load products when the page loads
+        };
+    </script>
 </body>
 </html>
