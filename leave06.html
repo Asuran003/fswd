@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #007BFF;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input, select, button, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .action-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .reject-btn {
+            background-color: #dc3545;
+        }
+
+        .action-btn:hover, .reject-btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Leave Management System</h1>
+        <nav>
+            <a href="#" onclick="showSection('login')">Login</a>
+            <a href="#" onclick="showSection('register')">Create Account</a>
+            <a href="#" onclick="showSection('apply')" class="hidden" id="applyLink">Apply for Leave</a>
+            <a href="#" onclick="showSection('view')" class="hidden" id="viewLink">View Leave Applications</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Login Section -->
+        <section id="login">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <label for="login_username">Username:</label>
+                <input type="text" id="login_username" required>
+                
+                <label for="login_password">Password:</label>
+                <input type="password" id="login_password" required>
+
+                <label for="role">Role:</label>
+                <select id="role" required>
+                    <option value="student">Student</option>
+                    <option value="teacher">Teacher</option>
+                </select>
+
+                <button type="submit">Login</button>
+            </form>
+            <p id="login_message" class="error"></p>
+        </section>
+
+        <!-- Register Section (Create Account) -->
+        <section id="register" class="hidden">
+            <h2>Create Account</h2>
+            <form id="registerForm">
+                <label for="register_username">Username:</label>
+                <input type="text" id="register_username" required>
+
+                <label for="register_password">Password:</label>
+                <input type="password" id="register_password" required>
+
+                <label for="register_password_confirm">Confirm Password:</label>
+                <input type="password" id="register_password_confirm" required>
+
+                <label for="role">Select Role:</label>
+                <select id="register_role" required>
+                    <option value="student">Student</option>
+                    <option value="teacher">Teacher</option>
+                </select>
+
+                <button type="submit">Create Account</button>
+            </form>
+            <p id="register_message" class="error"></p>
+        </section>
+
+        <!-- Apply Leave Section -->
+        <section id="apply" class="hidden">
+            <h2>Apply for Leave</h2>
+            <form id="leaveForm">
+                <label for="username">Username:</label>
+                <input type="text" id="username" disabled required>
+                
+                <label for="leave_type">Leave Type:</label>
+                <select id="leave_type" required>
+                    <option value="Sick Leave">Sick Leave</option>
+                    <option value="Casual Leave">Casual Leave</option>
+                    <option value="Annual Leave">Annual Leave</option>
+                </select>
+
+                <label for="start_date">Start Date:</label>
+                <input type="date" id="start_date" required>
+
+                <label for="end_date">End Date:</label>
+                <input type="date" id="end_date" required>
+
+                <label for="reason">Reason for Absence:</label>
+                <textarea id="reason" rows="4" required></textarea>
+
+                <button type="submit">Apply Leave</button>
+            </form>
+            <p id="message"></p>
+        </section>
+
+        <!-- View Leave Applications Section (Teacher's view) -->
+        <section id="view" class="hidden">
+            <h2>Leave Applications</h2>
+            <table id="leaveTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Leave Type</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Leave entries will be inserted here -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script>
+        let leaveApplications = [];
+        let leaveId = 1;
+        let users = {};  // Store users in memory (username: {password, role})
+        let currentUser = null;
+        let currentRole = null;
+
+        // Show the appropriate section
+        function showSection(section) {
+            document.querySelectorAll('main > section').forEach(s => {
+                s.classList.add('hidden');
+            });
+            document.getElementById(section).classList.remove('hidden');
+        }
+
+        // Register a new user
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('register_username').value;
+            const password = document.getElementById('register_password').value;
+            const confirmPassword = document.getElementById('register_password_confirm').value;
+            const role = document.getElementById('register_role').value;
+
+            if (password !== confirmPassword) {
+                document.getElementById('register_message').innerText = 'Passwords do not match.';
+                return;
+            }
+
+            if (users[username]) {
+                document.getElementById('register_message').innerText = 'Username already exists.';
+                return;
+            }
+
+            // Save the new user
+            users[username] = { password, role };
+            document.getElementById('register_message').innerText = 'Account created successfully!';
+            document.getElementById('register_message').classList.add('success');
+            
+            // Switch to login page
+            setTimeout(() => {
+                showSection('login');
+                document.getElementById('register_message').innerText = '';
+            }, 2000);
+        });
+
+        // Login logic
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('login_username').value;
+            const password = document.getElementById('login_password').value;
+            const role = document.getElementById('role').value;
+
+            if (users[username] && users[username].password === password && users[username].role === role) {
+                currentUser = username;
+                currentRole = role;
+                document.getElementById('login').classList.add('hidden');
+                document.getElementById('applyLink').classList.remove('hidden');
+                document.getElementById('viewLink').classList.remove('hidden');
+
+                // Show specific section based on role
+                if (role === 'student') {
+                    showSection('apply');
+                } else if (role === 'teacher') {
+                    showSection('view');
+                }
+
+                document.getElementById('login_message').innerText = '';
+            } else {
+                document.getElementById('login_message').innerText = 'Invalid username, password, or role.';
+            }
+        });
+
+        // Apply Leave logic (for students)
+        document.getElementById('leaveForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = currentUser;
+            const leaveType = document.getElementById('leave_type').value;
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+            const reason = document.getElementById('reason').value;
+
+            leaveApplications.push({
+                id: leaveId++,
+                user: username,
+                leaveType: leaveType,
+                startDate: startDate,
+                endDate: endDate,
+                reason: reason,
+                status: 'Pending'
+            });
+
+            document.getElementById('leaveForm').reset();
+            document.getElementById('message').innerText = 'Leave applied successfully!';
+
+            updateLeaveTable();
+        });
+
+        // Approve or Reject leave request (for teachers)
+        function updateLeaveTable() {
+            const tableBody = document.querySelector('#leaveTable tbody');
+            tableBody.innerHTML = '';
+
+            leaveApplications.forEach(app => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${app.id}</td>
+                    <td>${app.user}</td>
+                    <td>${app.leaveType}</td>
+                    <td>${app.startDate}</td>
+                    <td>${app.endDate}</td>
+                    <td>${app.reason}</td>
+                    <td>${app.status}</td>
+                    <td>
+                        <button class="action-btn" onclick="approveLeave(${app.id})">Approve</button>
+                        <button class="reject-btn" onclick="rejectLeave(${app.id})">Reject</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Approve leave
+        function approveLeave(id) {
+            const app = leaveApplications.find(app => app.id === id);
+            if (app) {
+                app.status = 'Approved';
+                updateLeaveTable();
+            }
+        }
+
+        // Reject leave
+        function rejectLeave(id) {
+            const app = leaveApplications.find(app => app.id === id);
+            if (app) {
+                app.status = 'Rejected';
+                updateLeaveTable();
+            }
+        }
+
+        // Show the login section by default
+        showSection('login');
+    </script>
+</body>
+</html>
