@@ -1,352 +1,122 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-height, initial-scale=1.0">
-    <title>Food Delivery</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            padding: 1rem;
-        }
-        #login-form, #registration-form {
-            margin: 2rem auto;
-            padding: 1rem;
-            width: 300px; /* Smaller width */
-            background-color: #007BFF; /* Blue color */
-            color: white;
-            border-radius: 8px; /* Rounded corners */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Slight shadow */
-        }
-        h2 {
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        input {
-            margin: 0.5rem; 
-            padding: 0.3rem;
-            width: 100%; /* Full width for inputs */
-            border-radius: 4px; /* Rounded corners for inputs */
-        }
-        button {
-            margin: 0.5rem; 
-            padding: 0.3rem;
-            width: 100%; /* Full width for buttons */
-            background-color: #0056b3; /* Darker blue for buttons */
-            color: #fff;
-            border: none; 
-            border-radius: 4px; /* Rounded corners for buttons */
-            cursor: pointer;
-        }
-        footer {
-            text-align: center;
-            padding: 1rem;
-            background-color: #f1f1f1;
-        }
-        main {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-            display: none; /* Hide until logged in */
-        }
-        .food-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-        }
-        .address-form {
-            display: none;
-            margin-top: 1rem;
-        }
-        .order-summary {
-            margin-top: 20px;
-        }
-        #orderHistory {
-            margin-top: 2rem;
-        }
-        #orderHistory h3 {
-            margin-bottom: 1rem;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles4.css">
+    <title>Food Delivery App</title>
 </head>
 <body>
-    <header>
-        <h1>Food Delivery Service</h1>
-    </header>
+    <!-- Authentication Form -->
+    <div id="auth-form">
+        <h2 id="form-title">Login</h2>
+        <input type="text" id="auth-username" placeholder="Username" required>
+        <input type="password" id="auth-password" placeholder="Password" required>
+        <input type="password" id="auth-confirm-password" class="hidden" placeholder="Confirm Password">
+        <div id="auth-error" class="hidden"></div>
+        <button id="auth-btn">Login</button>
+        <div id="auth-toggle-text">New user? <a href="#" id="toggle-link">Register here</a></div>
+    </div>
+
+    <!-- User Dashboard -->
+    <div id="user-dashboard" class="hidden">
+        <h2>Welcome, <span id="user-username"></span>!</h2>
+        <button id="logout-btn" class="hidden">Logout</button>
+        <h3>Select a Hotel</h3>
+        <div id="hotel-list">
+            <div class="hotel-item">
+                <img src="https://www.cspinet.org/sites/default/files/styles/og_image/public/media/images/misc/KFC_Logo.png?itok=2l5VeRW_" alt="Hotel 1">
+                <h4>KFC</h4>
+                <button onclick="showFoodItems('hotel1')">View Menu</button>
+            </div>
+            <div class="hotel-item">
+                <img src="https://mma.prnewswire.com/media/773120/POPEYES_Logo.jpg?p=facebook" alt="Hotel 2">
+                <h4>Popeyes</h4>
+                <button onclick="showFoodItems('hotel2')">View Menu</button>
+            </div>
+            <div class="hotel-item">
+                <img src="https://1000logos.net/wp-content/uploads/2017/05/Subway-Logo.png" alt="Hotel 3">
+                <h4>Subway</h4>
+                <button onclick="showFoodItems('hotel3')">View Menu</button>
+            </div>
+            
+            <div class="hotel-item">
+                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/1/14/PizzaHut_logo.svg/1200px-PizzaHut_logo.svg.png" alt="Hotel 4">
+                <h4>Pizza Hut</h4>
+                <button onclick="showFoodItems('hotel4')">View Menu</button>
+            </div>
+            
+            <div class="hotel-item">
+                <img src="https://1000logos.net/wp-content/uploads/2017/04/Dominos-logo-768x432.png" alt="Hotel 5">
+                <h4>Domino's</h4>
+                <button onclick="showFoodItems('hotel5')">View Menu</button>
+            </div>
+            
+            <div class="hotel-item">
+                <img src="https://upload.wikimedia.org/wikipedia/en/7/79/Saravana_Bhavan_Logo.jpg" alt="Hotel 6">
+                <h4>Saravana Bhavan</h4>
+                <button onclick="showFoodItems('hotel6')">View Menu</button>
+            </div>
+            
+        </div>
+        <h3>Your Order History</h3>
+        <ul id="order-history"></ul>
+    </div>
+
+    <!-- Food Menu -->
+    <div id="food-menu" class="hidden">
+        <h3 id="menu-title">Food Menu</h3>
+        <div id="menu-items"></div>
+        <button id="view-cart-btn" onclick="viewCart()">View Cart</button>
+        <button onclick="goBackToHotels()">Back to Hotels</button>
+    </div>
+
+    <!-- Cart Page with Summary -->
+    <div id="cart-page" class="hidden">
+        <h3>Your Cart</h3>
+        <ul id="cart-items"></ul>
+        <h4>Total: <span id="cart-total"></span></h4>
+        <button onclick="proceedToCheckout()">Proceed to Checkout</button>
+        <button onclick="goBackToMenu()">Back to Menu</button>
+    </div>
+
+ <!-- Payment Page -->
+<div id="payment-page" class="hidden">
+    <h2>Payment Details</h2>
+    <form>
+        <label for="name">Name:</label>
+        <input type="text" id="name" required>
+        
+        <label for="address">Address:</label>
+        <input type="text" id="address" required>
+        
+        <label for="phone">Phone Number:</label>
+        <input type="tel" id="phone" required>
+        
+        <label for="payment-method">Payment Method:</label>
+        <select id="payment-method">
+            <option value="credit-card">Credit Card</option>
+            <option value="paypal">PayPal</option>
+        </select>
+        
+        <h4>Order Summary:</h4>
+        <ul id="summary-items"></ul>
+        <h4>Total: <span id="summary-total"></span></h4>
+        
+        <button type="button" onclick="completeOrder()">Submit Payment</button>
+    </form>
     
-    <div id="login-form">
-        <h2>Login</h2>
-        <input type="text" id="username" placeholder="Username" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button id="login-btn">Login</button>
-        <p>Don't have an account? <a href="#" id="show-register" style="color: #fff;">Create an account</a></p>
-    </div>
+    <button onclick="goBackToCart()">Back to Cart</button>
+</div>
 
-    <div id="registration-form" style="display: none;">
-        <h2>Register</h2>
-        <input type="text" id="reg-username" placeholder="Username" required>
-        <input type="password" id="reg-password" placeholder="Password" required>
-        <button id="register-btn">Register</button>
-    </div>
+<!-- Order History Page -->
+<div id="order-history-page" class="hidden">
+    <h2>Order History</h2>
+    <ul id="order-history"></ul>
+    <button onclick="goBackToHotels()">Back to Hotels</button>
+</div>
 
-    <main id="user-main">
-        <div id="menu"></div>
-        <div id="orderSummary" class="order-summary"></div>
-        <button id="orderButton">Place Order</button>
-        <div class="address-form" id="addressForm">
-            <h3>Delivery Information</h3>
-            <input type="text" id="mobileNumber" placeholder="Mobile Number" required>
-            <input type="text" id="deliveryAddress" placeholder="Delivery Address" required>
-            <button id="confirmOrder">Confirm Order</button>
-        </div>
-
-        <!-- Order History Section -->
-        <div id="orderHistory">
-            <h3>Your Previous Orders</h3>
-            <div id="orderHistoryContent"></div>
-        </div>
-    </main>
-
-    <footer>
-        <p>&copy; 2024 Food Delivery</p>
-    </footer>
-
-    <script>
-        const loginForm = document.getElementById('login-form');
-        const registrationForm = document.getElementById('registration-form');
-        const userMain = document.getElementById('user-main');
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password'); 
-        const registerButton = document.getElementById('register-btn');
-        const loginButton = document.getElementById('login-btn');
-        const orderButton = document.getElementById('orderButton');
-        const addressForm = document.getElementById('addressForm');
-        const confirmOrderButton = document.getElementById('confirmOrder');
-        const orderSummary = document.getElementById('orderSummary');
-        const orderHistoryContent = document.getElementById('orderHistoryContent');
-        let currentUser = null;
-        const prices = {
-            pizza: 10,
-            burger: 8,
-            pasta: 12
-        };
-        const quantities = {
-            pizza: 0,
-            burger: 0,
-            pasta: 0
-        };
-
-        // Show registration form
-        document.getElementById('show-register').addEventListener('click', (e) => {
-            e.preventDefault();
-            registrationForm.style.display = 'block';
-            loginForm.style.display = 'none';
-        });
-
-        // Registration logic
-        registerButton.addEventListener('click', () => {
-            const regUsername = document.getElementById('reg-username').value.trim();
-            const regPassword = document.getElementById('reg-password').value.trim();
-
-            if (regUsername && regPassword) {
-                if (registerUser(regUsername, regPassword)) {
-                    alert('Registration successful! Please log in.');
-                    registrationForm.style.display = 'none';
-                    loginForm.style.display = 'block';
-                } else {
-                    alert('Username already exists. Please choose another one.');
-                }
-            } else {
-                alert('Please enter both username and password.');
-            }
-        });
-
-        function registerUser(username, password) {
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            if (!users.some(user => user.username === username)) {
-                users.push({ username, password });
-                localStorage.setItem('users', JSON.stringify(users));
-                return true;
-            }
-            return false;
-        }
-
-        // Login logic
-        loginButton.addEventListener('click', () => {
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value.trim();
-
-            if (username && password) {
-                if (checkCredentials(username, password)) {
-                    currentUser = username;
-                    loginForm.style.display = 'none'; 
-                    userMain.style.display = 'block'; 
-                    loadMenu();
-                    loadOrderHistory();
-                } else {
-                    alert('Invalid username or password.');
-                }
-            } else {
-                alert('Please enter both username and password.');
-            }
-        });
-
-        function checkCredentials(username, password) {
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            return users.some(user => user.username === username && user.password === password);
-        }
-
-        // Load menu items
-        function loadMenu() {
-            const menu = document.getElementById('menu');
-            menu.innerHTML = `
-                <h2>Menu</h2>
-                <div class="food-item">
-                    <span>Pizza - $10</span>
-                    <div class="quantity-controls">
-                        <button onclick="changeQuantity('pizza', -1)">-</button>
-                        <span id="pizza-quantity">0</span>
-                        <button onclick="changeQuantity('pizza', 1)">+</button>
-                    </div>
-                </div>
-                <div class="food-item">
-                    <span>Burger - $8</span>
-                    <div class="quantity-controls">
-                        <button onclick="changeQuantity('burger', -1)">-</button>
-                        <span id="burger-quantity">0</span>
-                        <button onclick="changeQuantity('burger', 1)">+</button>
-                    </div>
-                </div>
-                <div class="food-item">
-                    <span>Pasta - $12</span>
-                    <div class="quantity-controls">
-                        <button onclick="changeQuantity('pasta', -1)">-</button>
-                        <span id="pasta-quantity">0</span>
-                        <button onclick="changeQuantity('pasta', 1)">+</button>
-                    </div>
-                </div>
-            `;
-            updateOrderSummary();
-        }
-
-        // Function to change quantity
-        function changeQuantity(item, change) {
-            if (change < 0 && quantities[item] === 0) return; // Prevent negative quantity
-            quantities[item] += change;
-            updateOrderSummary();
-            document.getElementById(`${item}-quantity`).textContent = quantities[item];
-        }
-
-        // Update the order summary
-        function updateOrderSummary() {
-            let totalAmount = 0;
-            orderSummary.innerHTML = `<h3>Your Order:</h3>`;
-            for (const item in quantities) {
-                if (quantities[item] > 0) {
-                    const itemTotal = quantities[item] * prices[item];
-                    orderSummary.innerHTML += `<p>${item.charAt(0).toUpperCase() + item.slice(1)}: ${quantities[item]} x $${prices[item]} = $${itemTotal}</p>`;
-                    totalAmount += itemTotal;
-                }
-            }
-            orderSummary.innerHTML += `<p><strong>Total Amount: $${totalAmount}</strong></p>`;
-        }
-
-        // Place order logic
-        orderButton.addEventListener('click', () => {
-            if (Object.values(quantities).every(q => q === 0)) {
-                alert('Please select at least one item to order.');
-                return;
-            }
-            addressForm.style.display = 'block'; // Show address form
-        });
-
-        // Confirm order logic
-        confirmOrderButton.addEventListener('click', () => {
-            const mobileNumber = document.getElementById('mobileNumber').value.trim();
-            const deliveryAddress = document.getElementById('deliveryAddress').value.trim();
-
-            if (mobileNumber && deliveryAddress) {
-                const orderDetails = {
-                    items: { ...quantities },
-                    totalAmount: calculateTotalAmount(),
-                    mobileNumber,
-                    deliveryAddress,
-                    date: new Date().toLocaleString()
-                };
-
-                saveOrderToHistory(orderDetails);
-                alert('Your order has been placed successfully!');
-                alert('Kindly wait for 10 minutes, your order is on the way!');
-                // Reset quantities and order summary
-                resetOrder();
-                loadOrderHistory();
-            } else {
-                alert('Please provide your mobile number and delivery address.');
-            }
-        });
-
-        // Calculate total amount
-        function calculateTotalAmount() {
-            return Object.keys(quantities).reduce((total, item) => total + (quantities[item] * prices[item]), 0);
-        }
-
-        // Save order to history in localStorage
-        function saveOrderToHistory(orderDetails) {
-            const orderHistory = JSON.parse(localStorage.getItem(`${currentUser}_orders`)) || [];
-            orderHistory.push(orderDetails);
-            localStorage.setItem(`${currentUser}_orders`, JSON.stringify(orderHistory));
-        }
-
-        // Load and display order history
-        function loadOrderHistory() {
-            const orderHistory = JSON.parse(localStorage.getItem(`${currentUser}_orders`)) || [];
-            if (orderHistory.length === 0) {
-                orderHistoryContent.innerHTML = '<p>No previous orders found.</p>';
-                return;
-            }
-
-            orderHistoryContent.innerHTML = '';
-            orderHistory.forEach((order, index) => {
-                orderHistoryContent.innerHTML += `
-                    <div>
-                        <h4>Order ${index + 1} (Placed on: ${order.date})</h4>
-                        <p>Items: ${JSON.stringify(order.items)}</p>
-                        <p>Total Amount: $${order.totalAmount}</p>
-                        <p>Delivered to: ${order.deliveryAddress} (${order.mobileNumber})</p>
-                        <hr>
-                    </div>
-                `;
-            });
-        }
-
-        // Reset the order
-        function resetOrder() {
-            Object.keys(quantities).forEach(item => quantities[item] = 0);
-            updateOrderSummary();
-            addressForm.style.display = 'none'; // Hide address form
-            document.getElementById('mobileNumber').value = '';
-            document.getElementById('deliveryAddress').value = '';
-        }
-
-        // Initial setup for user storage
-        if (localStorage.getItem('users') === null) {
-            localStorage.setItem('users', JSON.stringify([]));
-        }
-
-        // Start with showing the login form
-        userMain.style.display = 'none';
-    </script>
+    <script src="script4.js"></script>
 </body>
 </html>
