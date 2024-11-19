@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0c61f3;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .task-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .task-table th, .task-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #e2c7c7;
+        }
+        .task-table th {
+            background-color: #cfc5c8;
+            color: rgb(245, 25, 25);
+        }
+        .task-table tr:hover {
+            background-color: #f1f1f1;
+        }
+        .button {
+            background-color: #4CAF50;
+            color: rgb(223, 22, 22);
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group input, .form-group select, .form-group button {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .status-count {
+            font-size: 16px;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e7e2f7;
+            border-radius: 5px;
+        }
+        .login-container, .register-container, .home-container {
+            width: 300px;
+            margin: auto;
+            padding: 20px;
+            background-color: #ac9e9e;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            display: none;
+        }
+        .home-container button {
+            width: 100%;
+        }
+        .home-image {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .home-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Home Page -->
+<div class="home-container" id="home-container">
+    <h2>Welcome to Project Management</h2>
+    <button class="button" id="login-link">Login</button>
+    <button class="button" id="register-link">Register</button>
+    
+    <!-- Image Section Below Task Management -->
+    <div class="home-image">
+        <img src="project.jpg" alt="Project Management Image">
+    </div>
+</div>
+
+<!-- Login Screen -->
+<div class="login-container" id="login-container">
+    <h2>Login</h2>
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter username">
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter password">
+    </div>
+    <button class="button" id="login-btn">Login</button>
+    <p>Don't have an account? <button class="button" id="register-link-login">Register</button></p>
+</div>
+
+<!-- Register Screen -->
+<div class="register-container" id="register-container">
+    <h2>Register</h2>
+    <div class="form-group">
+        <label for="new-username">Username</label>
+        <input type="text" id="new-username" placeholder="Enter a username">
+    </div>
+    <div class="form-group">
+        <label for="new-password">Password</label>
+        <input type="password" id="new-password" placeholder="Enter a password">
+    </div>
+    <div class="form-group">
+        <label for="confirm-password">Confirm Password</label>
+        <input type="password" id="confirm-password" placeholder="Confirm your password">
+    </div>
+    <button class="button" id="register-btn">Register</button>
+    <p>Already have an account? <button class="button" id="back-to-login-link">Login</button></p>
+</div>
+
+<!-- Project Management Dashboard -->
+<div class="container" id="dashboard-container">
+    <h1>Project Management Dashboard</h1>
+
+    <h2>Task List</h2>
+    <table class="task-table" id="task-table">
+        <thead>
+            <tr>
+                <th>Task ID</th>
+                <th>Task Name</th>
+                <th>Status</th>
+                <th>Assigned To</th>
+                <th>Due Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Task rows will be inserted here by JavaScript -->
+        </tbody>
+    </table>
+
+    <h2>Add New Task</h2>
+    <div class="form-group">
+        <label for="task-name">Task Name</label>
+        <input type="text" id="task-name" placeholder="Enter task name">
+    </div>
+    <div class="form-group">
+        <label for="assigned-to">Assigned To</label>
+        <input type="text" id="assigned-to" placeholder="Enter assignee name">
+    </div>
+    <div class="form-group">
+        <label for="due-date">Due Date</label>
+        <input type="date" id="due-date">
+    </div>
+    <button class="button" id="add-task-btn">Add Task</button>
+
+    <h2>Update Task Status</h2>
+    <div class="form-group">
+        <label for="task-id-update">Enter Task ID to Update</label>
+        <input type="number" id="task-id-update" placeholder="Task ID" min="1">
+    </div>
+    <div class="form-group">
+        <label for="task-status-update">Select New Status</label>
+        <select id="task-status-update">
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+        </select>
+    </div>
+    <button class="button" id="update-status-btn">Update Status</button>
+
+    <div class="status-count">
+        <p><strong>Total Pending Tasks: <span id="pending-count">0</span></strong></p>
+    </div>
+    <button class="button" id="logout-btn">Logout</button>
+</div>
+
+<script>
+    // Function to switch between login, register, home, and dashboard
+    function switchToHome() {
+        document.getElementById("home-container").style.display = "block";
+        document.getElementById("login-container").style.display = "none";
+        document.getElementById("register-container").style.display = "none";
+        document.getElementById("dashboard-container").style.display = "none";
+    }
+
+    function switchToDashboard() {
+        document.getElementById("home-container").style.display = "none";
+        document.getElementById("login-container").style.display = "none";
+        document.getElementById("register-container").style.display = "none";
+        document.getElementById("dashboard-container").style.display = "block";
+        renderTasks(); // Re-render the task list
+    }
+
+    function switchToLogin() {
+        document.getElementById("home-container").style.display = "none";
+        document.getElementById("login-container").style.display = "block";
+        document.getElementById("register-container").style.display = "none";
+        document.getElementById("dashboard-container").style.display = "none";
+    }
+
+    function switchToRegister() {
+        document.getElementById("home-container").style.display = "none";
+        document.getElementById("login-container").style.display = "none";
+        document.getElementById("register-container").style.display = "block";
+        document.getElementById("dashboard-container").style.display = "none";
+    }
+
+    // Check if the user is logged in
+    if (localStorage.getItem("isLoggedIn")) {
+        switchToDashboard();
+    } else {
+        switchToHome();
+    }
+
+    // Login functionality
+    document.getElementById("login-btn").addEventListener("click", function() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        const storedUser = localStorage.getItem(username);
+        if (storedUser && storedUser === password) {
+            localStorage.setItem("isLoggedIn", "true");
+            switchToDashboard();
+        } else {
+            alert("Invalid username or password. Please try again.");
+        }
+    });
+
+    // Register functionality
+    document.getElementById("register-btn").addEventListener("click", function() {
+        const username = document.getElementById("new-username").value;
+        const password = document.getElementById("new-password").value;
+        const confirmPassword = document.getElementById("confirm-password").value;
+
+        if (password === confirmPassword) {
+            localStorage.setItem(username, password);
+            alert("Registration successful. You can now login.");
+            switchToLogin();
+        } else {
+            alert("Passwords do not match. Please try again.");
+        }
+    });
+
+    // Navigate from login to register screen
+    document.getElementById("register-link-login").addEventListener("click", function() {
+        switchToRegister();
+    });
+
+    // Navigate from register to login screen
+    document.getElementById("back-to-login-link").addEventListener("click", function() {
+        switchToLogin();
+    });
+
+    // Navigate from home to login screen
+    document.getElementById("login-link").addEventListener("click", function() {
+        switchToLogin();
+    });
+
+    // Navigate from home to register screen
+    document.getElementById("register-link").addEventListener("click", function() {
+        switchToRegister();
+    });
+
+    // Logout functionality
+    document.getElementById("logout-btn").addEventListener("click", function() {
+        localStorage.removeItem("isLoggedIn");
+        switchToHome();
+    });
+
+    // Task-related functions
+    function generateTaskId() {
+        const tasks = getTasksFromLocalStorage();
+        return tasks.length > 0 ? Math.max(...tasks.map(task => task.id)) + 1 : 1;
+    }
+
+    function getTasksFromLocalStorage() {
+        const tasks = localStorage.getItem("tasks");
+        return tasks ? JSON.parse(tasks) : [];
+    }
+
+    function saveTasksToLocalStorage(tasks) {
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function renderTasks() {
+        const tasks = getTasksFromLocalStorage();
+        const taskTableBody = document.querySelector("#task-table tbody");
+        taskTableBody.innerHTML = "";
+
+        tasks.forEach(task => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${task.id}</td>
+                <td>${task.name}</td>
+                <td>${task.status}</td>
+                <td>${task.assignedTo}</td>
+                <td>${task.dueDate}</td>
+                <td><button class="button" onclick="deleteTask(${task.id})">Delete</button></td>
+            `;
+            taskTableBody.appendChild(row);
+        });
+
+        updatePendingCount();
+    }
+
+    function updatePendingCount() {
+        const tasks = getTasksFromLocalStorage();
+        const pendingTasks = tasks.filter(task => task.status === "Pending");
+        document.getElementById("pending-count").innerText = pendingTasks.length;
+    }
+
+    // Add new task
+    document.getElementById("add-task-btn").addEventListener("click", function() {
+        const name = document.getElementById("task-name").value;
+        const assignedTo = document.getElementById("assigned-to").value;
+        const dueDate = document.getElementById("due-date").value;
+
+        if (name && assignedTo && dueDate) {
+            const newTask = {
+                id: generateTaskId(),
+                name,
+                assignedTo,
+                dueDate,
+                status: "Pending"
+            };
+            const tasks = getTasksFromLocalStorage();
+            tasks.push(newTask);
+            saveTasksToLocalStorage(tasks);
+
+            document.getElementById("task-name").value = "";
+            document.getElementById("assigned-to").value = "";
+            document.getElementById("due-date").value = "";
+
+            renderTasks();
+        } else {
+            alert("Please fill out all fields.");
+        }
+    });
+
+    // Delete task
+    function deleteTask(taskId) {
+        const tasks = getTasksFromLocalStorage();
+        const updatedTasks = tasks.filter(task => task.id !== taskId);
+        saveTasksToLocalStorage(updatedTasks);
+        renderTasks();
+    }
+</script>
+
+</body>
+</html>
