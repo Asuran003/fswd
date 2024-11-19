@@ -56,7 +56,7 @@ const menus = {
 const foodImages = {
     hotel1: [
         'https://github.com/Asuran003/fswd/blob/main/Dosa.jpg', 
-        'https://example.com/wings.jpg', 
+        'https://github.com/Asuran003/fswd/blob/main/Hot%20Wings.jpg', 
         'https://example.com/fries.jpg', 
         'https://example.com/popcorn.jpg', 
         'https://example.com/strips.jpg'
